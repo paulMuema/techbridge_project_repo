@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-0">My Resources</h2>
+            <p class="text-muted mb-0">Manage your shared resources</p>
+        </div>
+        <a href="{{ url_for('new_resource') }}" class="btn btn-primary">
+            <i class="bi bi-plus-lg"></i> Share New Resource
+        </a>
+    </div>
+
+    {% if resources %}
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead class="table-light">
+                <tr>
+                    <th>Title</th>
+                    <th>Type</th>
+                    <th>Added</th>
+                    <th>Views</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for resource in resources %}
+                <tr>
+                    <td>
+                        <a href="{{ url_for('view_resource', id=resource.id) }}" class="text-decoration-none">
+                            {{ resource.title }}
+                        </a>
+                        {% if resource.tags %}
+                        <div class="mt-1">
+                            {% for tag in resource.tags.split(',')[:3] %}
+                            <span class="badge bg-secondary">{{ tag.strip() }}</span>
+                            {% endfor %}
+                            {% if resource.tags.split(',')|length > 3 %}
+                            <span class="badge bg-secondary">+{{ resource.tags.split(',')|length - 3 }}</span>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                    </td>
+                    <td><span class="badge bg-primary">{{ resource.resource_type.title() }}</span></td>
+                    <td>{{ resource.created_at.strftime('%B %d, %Y') }}</td>
+                    <td>-</td>
+                    <td>
+                        <div class="btn-group">
+                            <a href="{{ resource.url }}" class="btn btn-sm btn-outline-secondary" target="_blank">
+                                <i class="bi bi-box-arrow-up-right"></i>
+                            </a>
+                            <a href="#" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <button type="button" class="btn btn-sm btn-outline-danger">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <div class="display-1 text-muted mb-4">
+            <i class="bi bi-collection"></i>
+        </div>
+        <h4>No Resources Shared Yet</h4>
+        <p class="text-muted">Start sharing your knowledge with the community!</p>
+        <a href="{{ url_for('new_resource') }}" class="btn btn-primary mt-2">
+            <i class="bi bi-plus-lg"></i> Share Your First Resource
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

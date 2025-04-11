@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block title %}Profile{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-body text-center">
+                <div class="position-relative d-inline-block mb-3">
+                    <img src="{{ url_for('static', filename='profile_pics/' + current_user.profile_pic) }}" 
+                         class="rounded-circle" alt="Profile Picture" 
+                         style="width: 150px; height: 150px; object-fit: cover;">
+                </div>
+                <h3 class="card-title">{{ current_user.name }}</h3>
+                <p class="text-muted">{{ current_user.profession or 'No profession set' }}</p>
+                <p class="text-muted">
+                    <i class="bi bi-geo-alt-fill"></i> 
+                    {{ current_user.location or 'No location set' }}
+                </p>
+                <a href="{{ url_for('edit_profile') }}" class="btn btn-primary">Edit Profile</a>
+            </div>
+        </div>
+
+        {% if current_user.github or current_user.linkedin or current_user.website %}
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Connect</h5>
+                <div class="list-group list-group-flush">
+                    {% if current_user.github %}
+                    <a href="{{ current_user.github }}" class="list-group-item list-group-item-action" target="_blank">
+                        <i class="bi bi-github me-2"></i> GitHub
+                    </a>
+                    {% endif %}
+                    {% if current_user.linkedin %}
+                    <a href="{{ current_user.linkedin }}" class="list-group-item list-group-item-action" target="_blank">
+                        <i class="bi bi-linkedin me-2"></i> LinkedIn
+                    </a>
+                    {% endif %}
+                    {% if current_user.website %}
+                    <a href="{{ current_user.website }}" class="list-group-item list-group-item-action" target="_blank">
+                        <i class="bi bi-globe me-2"></i> Website
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title">About</h5>
+                <p>{{ current_user.bio or 'No bio added yet.' }}</p>
+                
+                {% if current_user.company %}
+                <p><strong>Company:</strong> {{ current_user.company }}</p>
+                {% endif %}
+                
+                <p><strong>Experience Level:</strong> {{ current_user.experience_level or 'Not specified' }}</p>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Skills</h5>
+                {% if current_user.skills %}
+                    {% for skill in current_user.skills.split(',') %}
+                        <span class="badge bg-primary me-2 mb-2">{{ skill }}</span>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted">No skills added yet.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Interests</h5>
+                {% if current_user.interests %}
+                    {% for interest in current_user.interests.split(',') %}
+                        <span class="badge bg-info me-2 mb-2">{{ interest }}</span>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted">No interests added yet.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Preferred Programming Languages</h5>
+                {% if current_user.preferred_languages %}
+                    {% for language in current_user.preferred_languages.split(',') %}
+                        <span class="badge bg-success me-2 mb-2">{{ language }}</span>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted">No preferred languages added yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

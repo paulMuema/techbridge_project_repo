@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Profile{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <h2 class="card-title text-center mb-4">Edit Your Profile</h2>
+                <form method="POST" enctype="multipart/form-data">
+                    <div class="text-center mb-4">
+                        <img src="{{ url_for('static', filename='profile_pics/' + current_user.profile_pic) }}" 
+                             class="rounded-circle mb-3" alt="Profile Picture"
+                             style="width: 150px; height: 150px; object-fit: cover;">
+                        <div class="mb-3">
+                            <label for="profile_pic" class="form-label">Change Profile Picture</label>
+                            <input type="file" class="form-control" id="profile_pic" name="profile_pic" accept="image/*">
+                            <div class="form-text">Supported formats: PNG, JPG, JPEG, GIF (max 16MB)</div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="profession" class="form-label">Profession</label>
+                            <input type="text" class="form-control" id="profession" name="profession" value="{{ current_user.profession or '' }}">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="company" class="form-label">Company/Organization</label>
+                            <input type="text" class="form-control" id="company" name="company" value="{{ current_user.company or '' }}">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="location" class="form-label">Location</label>
+                        <input type="text" class="form-control" id="location" name="location" value="{{ current_user.location or '' }}">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="bio" class="form-label">Bio</label>
+                        <textarea class="form-control" id="bio" name="bio" rows="4">{{ current_user.bio or '' }}</textarea>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="website" class="form-label">Website</label>
+                            <input type="url" class="form-control" id="website" name="website" 
+                                   value="{{ current_user.website or '' }}" placeholder="https://your-website.com">
+                            <div class="form-text">Full URL including https://</div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="github" class="form-label">GitHub Profile</label>
+                            <input type="url" class="form-control" id="github" name="github" 
+                                   value="{{ current_user.github or '' }}" placeholder="https://github.com/username">
+                            <div class="form-text">Full GitHub profile URL</div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="linkedin" class="form-label">LinkedIn Profile</label>
+                            <input type="url" class="form-control" id="linkedin" name="linkedin" 
+                                   value="{{ current_user.linkedin or '' }}" placeholder="https://www.linkedin.com/in/username">
+                            <div class="form-text">Full LinkedIn profile URL</div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="experience_level" class="form-label">Experience Level</label>
+                        <select class="form-select" id="experience_level" name="experience_level">
+                            <option value="">Select level</option>
+                            <option value="Beginner" {% if current_user.experience_level == 'Beginner' %}selected{% endif %}>Beginner</option>
+                            <option value="Intermediate" {% if current_user.experience_level == 'Intermediate' %}selected{% endif %}>Intermediate</option>
+                            <option value="Advanced" {% if current_user.experience_level == 'Advanced' %}selected{% endif %}>Advanced</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Skills (press Enter to add)</label>
+                        <input type="text" class="form-control" id="skillInput" placeholder="Add a skill">
+                        <div id="skillTags" class="mt-2">
+                            {% if current_user.skills %}
+                                {% for skill in current_user.skills.split(',') %}
+                                    <span class="badge bg-primary me-2 mb-2">
+                                        {{ skill }}
+                                        <i class="bi bi-x-circle ms-1" onclick="removeTag(this, 'skills')"></i>
+                                    </span>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        <input type="hidden" id="skillsHidden" name="skills[]" value="{{ current_user.skills or '' }}">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Interests (press Enter to add)</label>
+                        <input type="text" class="form-control" id="interestInput" placeholder="Add an interest">
+                        <div id="interestTags" class="mt-2">
+                            {% if current_user.interests %}
+                                {% for interest in current_user.interests.split(',') %}
+                                    <span class="badge bg-info me-2 mb-2">
+                                        {{ interest }}
+                                        <i class="bi bi-x-circle ms-1" onclick="removeTag(this, 'interests')"></i>
+                                    </span>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        <input type="hidden" id="interestsHidden" name="interests[]" value="{{ current_user.interests or '' }}">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Preferred Programming Languages (press Enter to add)</label>
+                        <input type="text" class="form-control" id="languageInput" placeholder="Add a programming language">
+                        <div id="languageTags" class="mt-2">
+                            {% if current_user.preferred_languages %}
+                                {% for language in current_user.preferred_languages.split(',') %}
+                                    <span class="badge bg-success me-2 mb-2">
+                                        {{ language }}
+                                        <i class="bi bi-x-circle ms-1" onclick="removeTag(this, 'languages')"></i>
+                                    </span>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        <input type="hidden" id="languagesHidden" name="preferred_languages[]" value="{{ current_user.preferred_languages or '' }}">
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                        <a href="{{ url_for('profile') }}" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function initializeTagInput(inputId, tagsId, hiddenId, badgeClass) {
+    const input = document.getElementById(inputId);
+    const tagsContainer = document.getElementById(tagsId);
+    const hiddenInput = document.getElementById(hiddenId);
+
+    input.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            const value = this.value.trim();
+            if (value) {
+                const tag = document.createElement('span');
+                tag.className = `badge ${badgeClass} me-2 mb-2`;
+                tag.innerHTML = `${value} <i class="bi bi-x-circle ms-1" onclick="removeTag(this, '${tagsId}')"></i>`;
+                tagsContainer.appendChild(tag);
+                this.value = '';
+                updateHiddenInput(tagsId, hiddenId);
+            }
+        }
+    });
+}
+
+function removeTag(element, containerId) {
+    element.parentElement.remove();
+    updateHiddenInput(containerId, containerId + 'Hidden');
+}
+
+function updateHiddenInput(tagsId, hiddenId) {
+    const tags = document.getElementById(tagsId).getElementsByClassName('badge');
+    const values = Array.from(tags).map(tag => tag.textContent.trim());
+    document.getElementById(hiddenId).value = values.join(',');
+}
+
+// Initialize tag inputs
+document.addEventListener('DOMContentLoaded', function() {
+    initializeTagInput('skillInput', 'skillTags', 'skillsHidden', 'bg-primary');
+    initializeTagInput('interestInput', 'interestTags', 'interestsHidden', 'bg-info');
+    initializeTagInput('languageInput', 'languageTags', 'languagesHidden', 'bg-success');
+});
+</script>
+{% endblock %}

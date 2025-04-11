@@ -1,0 +1,43 @@
+📌 What is Kubernetes?
+Kubernetes is an open-source container orchestration platform designed to automate deployment, scaling, and management of containerized applications.
+
+🚀 Key Features
+Automated Load Balancing: Distributes network traffic to ensure stability.
+
+Self-Healing: Restarts failed containers and replaces unhealthy ones.
+
+Horizontal Scaling: Automatically scales apps up/down based on demand.
+
+Service Discovery: Finds and connects services without hardcoding IPs.
+
+Rolling Updates & Rollbacks: Deploy updates without downtime.
+
+Secrets & ConfigMaps: Manage sensitive data separately from containers.
+
+⚙️ Kubernetes Architecture
+1️⃣ Master Node (Control Plane)
+API Server: Handles all cluster communication.
+
+Scheduler: Assigns pods to nodes based on resource availability.
+
+Controller Manager: Ensures the desired state of the cluster.
+
+etcd: A key-value store for cluster data.
+
+2️⃣ Worker Nodes
+Kubelet: Communicates with the master, runs pods.
+
+Kube Proxy: Manages networking between services.
+
+Container Runtime: Runs the containers (e.g., Docker, containerd).
+
+🔑 Core Kubernetes Concepts
+Concept	Description
+Pod	Smallest deployable unit in K8s, runs one or more containers.
+Service	Exposes pods internally or externally (LoadBalancer, ClusterIP, NodePort).
+Deployment	Manages scaling and rolling updates of pods.
+Ingress	Routes external HTTP/S traffic to services inside the cluster.
+ConfigMap	Stores non-sensitive app configuration data.
+Secret	Stores sensitive data like API keys securely.
+Persistent Volume (PV)	Stores data that persists beyond pod lifecycle.
+Namespace	Isolates groups of resources in a cluster.

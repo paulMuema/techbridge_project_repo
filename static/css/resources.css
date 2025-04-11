@@ -1,0 +1,63 @@
+/* Resource Card Styles */
+.hover-shadow {
+    transition: all 0.3s ease;
+}
+
+.hover-shadow:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Search Input Styles */
+.input-group-text {
+    color: #6c757d;
+}
+
+.form-control:focus {
+    box-shadow: none;
+    border-color: #0d6efd;
+}
+
+/* Filter Styles */
+.form-select:focus {
+    box-shadow: none;
+    border-color: #0d6efd;
+}
+
+/* Tag Styles */
+.badge.bg-light {
+    border: 1px solid rgba(0,0,0,0.1);
+}
+
+/* Empty State Styles */
+.empty-state {
+    padding: 3rem 1rem;
+}
+
+.empty-state .display-1 {
+    font-size: 4rem;
+    opacity: 0.5;
+}
+
+/* Resource Stats */
+.resource-stats {
+    font-size: 0.875rem;
+}
+
+/* Card Header Gradients */
+.bg-success.bg-opacity-10 {
+    background: linear-gradient(45deg, rgba(25,135,84,0.1) 0%, rgba(25,135,84,0.05) 100%);
+}
+
+.bg-warning.bg-opacity-10 {
+    background: linear-gradient(45deg, rgba(255,193,7,0.1) 0%, rgba(255,193,7,0.05) 100%);
+}
+
+.bg-danger.bg-opacity-10 {
+    background: linear-gradient(45deg, rgba(220,53,69,0.1) 0%, rgba(220,53,69,0.05) 100%);
+}
+
+/* Hero Section */
+.bg-primary.bg-gradient {
+    background: linear-gradient(45deg, #0d6efd 0%, #0a58ca 100%) !important;
+}

@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+
+{% block title %}{{ user.username }}'s Profile{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <!-- Profile Sidebar -->
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-body text-center">
+                    <img src="{{ url_for('static', filename='profile_pics/' + user.profile_pic) }}" 
+                         class="rounded-circle mb-3" alt="Profile Picture"
+                         style="width: 150px; height: 150px; object-fit: cover;">
+                    <h3 class="card-title">{{ user.name }}</h3>
+                    {% if user.profession %}
+                        <p class="text-muted">{{ user.profession }}</p>
+                    {% endif %}
+                    {% if user.company %}
+                        <p class="text-muted">{{ user.company }}</p>
+                    {% endif %}
+                    {% if user.location %}
+                        <p class="text-muted"><i class="bi bi-geo-alt"></i> {{ user.location }}</p>
+                    {% endif %}
+                    
+                    {% if current_user.is_authenticated and current_user.id == user.id %}
+                        <a href="{{ url_for('edit_profile') }}" class="btn btn-primary">
+                            <i class="bi bi-pencil"></i> Edit Profile
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">About</h5>
+                    {% if user.bio %}
+                        <p class="card-text">{{ user.bio }}</p>
+                    {% else %}
+                        <p class="text-muted">No bio available.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Skills & Interests</h5>
+                    {% if skills %}
+                        <h6 class="mt-3">Skills</h6>
+                        <div class="d-flex flex-wrap gap-2 mb-3">
+                            {% for skill in skills %}
+                                <span class="badge bg-primary">{{ skill.strip() }}</span>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    {% if interests %}
+                        <h6>Interests</h6>
+                        <div class="d-flex flex-wrap gap-2">
+                            {% for interest in interests %}
+                                <span class="badge bg-secondary">{{ interest.strip() }}</span>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    {% if preferred_languages %}
+                        <h6 class="mt-3">Preferred Languages</h6>
+                        <div class="d-flex flex-wrap gap-2">
+                            {% for lang in preferred_languages %}
+                                <span class="badge bg-info">{{ lang.strip() }}</span>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if user.website or user.github or user.linkedin %}
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Connect</h5>
+                    <div class="d-flex gap-3">
+                        {% if user.website %}
+                            <a href="{{ user.website }}" target="_blank" class="text-decoration-none">
+                                <i class="bi bi-globe fs-4"></i>
+                            </a>
+                        {% endif %}
+                        {% if user.github %}
+                            <a href="https://github.com/{{ user.github }}" target="_blank" class="text-decoration-none">
+                                <i class="bi bi-github fs-4"></i>
+                            </a>
+                        {% endif %}
+                        {% if user.linkedin %}
+                            <a href="https://linkedin.com/in/{{ user.linkedin }}" target="_blank" class="text-decoration-none">
+                                <i class="bi bi-linkedin fs-4"></i>
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Resources Section -->
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Shared Resources</h5>
+                </div>
+                <div class="card-body">
+                    {% if resources %}
+                        <div class="list-group list-group-flush">
+                            {% for resource in resources %}
+                            <div class="list-group-item">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h6 class="mb-1">
+                                            <a href="{{ url_for('view_resource', id=resource.id) }}" class="text-decoration-none">
+                                                {{ resource.title }}
+                                            </a>
+                                        </h6>
+                                        <p class="mb-2 text-secondary small">{{ resource.description[:150] }}...</p>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="badge bg-{{ 'success' if resource.difficulty_level == 'beginner' else 'warning' if resource.difficulty_level == 'intermediate' else 'danger' }} rounded-pill">
+                                                {{ resource.difficulty_level.title() }}
+                                            </span>
+                                            <span class="badge bg-primary rounded-pill">
+                                                {{ resource.resource_type.title() }}
+                                            </span>
+                                            <small class="text-muted">
+                                                {{ resource.created_at.strftime('%B %d, %Y') }}
+                                            </small>
+                                        </div>
+                                    </div>
+                                    {% if resource.files %}
+                                    <a href="{{ url_for('resource_file', filename=resource.files[0].filename) }}" 
+                                       class="btn btn-outline-primary btn-sm">
+                                        <i class="bi bi-download"></i>
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <div class="display-1 text-secondary mb-4">
+                                <i class="bi bi-collection"></i>
+                            </div>
+                            <h5>No Resources Yet</h5>
+                            <p class="text-secondary">This user hasn't shared any resources yet.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

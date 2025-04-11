@@ -1,0 +1,277 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="section dashboard-section py-4">
+    <div class="container-fluid px-4">
+        <!-- Welcome Section -->
+        <div class="mb-4">
+            <h2 class="section-title mb-2">Welcome back, {{ current_user.name }}!</h2>
+            <p class="section-subtitle mb-0">Track your progress and manage your learning resources</p>
+        </div>
+
+        <div class="row g-4">
+            <!-- Sidebar -->
+            <div class="col-md-4 col-xl-3">
+                <div class="card sidebar-card">
+                    <div class="card-body p-0">
+                        <div class="list-group list-group-flush">
+                            <div class="p-3 border-bottom">
+                                <div class="d-flex align-items-center">
+                                    <img src="{{ url_for('static', filename='profile_pics/' + current_user.profile_pic) }}" 
+                                         alt="Profile" class="rounded-circle me-3" width="48" height="48">
+                                    <div>
+                                        <h6 class="mb-1">{{ current_user.name }}</h6>
+                                        <span class="text-secondary small">{{ current_user.role }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <a href="{{ url_for('resources') }}" class="list-group-item list-group-item-action">
+                                <i class="bi bi-collection-fill me-2"></i> All Resources
+                            </a>
+                            <a href="{{ url_for('new_resource') }}" class="list-group-item list-group-item-action">
+                                <i class="bi bi-plus-circle-fill me-2"></i> Share Resource
+                            </a>
+                            <a href="{{ url_for('profile') }}" class="list-group-item list-group-item-action">
+                                <i class="bi bi-person-fill me-2"></i> Profile
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-8 col-xl-9">
+                <!-- Stats Cards -->
+                <div class="row g-4 mb-4">
+                    <div class="col-md-4">
+                        <div class="stats-card">
+                            <div class="d-flex align-items-center">
+                                <div class="icon bg-primary bg-opacity-10 text-primary me-3">
+                                    <i class="bi bi-collection"></i>
+                                </div>
+                                <div>
+                                    <h4 class="stats-value mb-0">{{ stats.total_resources }}</h4>
+                                    <span class="stats-title">Total Resources</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="stats-card">
+                            <div class="d-flex align-items-center">
+                                <div class="icon bg-success bg-opacity-10 text-success me-3">
+                                    <i class="bi bi-file-earmark-text"></i>
+                                </div>
+                                <div>
+                                    <h4 class="stats-value mb-0">{{ stats.total_files }}</h4>
+                                    <span class="stats-title">Total Files</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="stats-card">
+                            <div class="d-flex align-items-center">
+                                <div class="icon bg-warning bg-opacity-10 text-warning me-3">
+                                    <i class="bi bi-lightning-charge"></i>
+                                </div>
+                                <div>
+                                    <h4 class="stats-value mb-0">{{ stats.my_resources }}</h4>
+                                    <span class="stats-title">My Resources</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- My Resources Card -->
+                <div class="card mb-4">
+                    <div class="card-header border-0 bg-transparent py-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h5 class="mb-0">My Resources</h5>
+                            </div>
+                            <a href="{{ url_for('new_resource') }}" class="btn btn-primary btn-sm">
+                                <i class="bi bi-plus-lg me-2"></i>Share Resource
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        {% if my_resources %}
+                        <div class="list-group list-group-flush">
+                            {% for resource in my_resources %}
+                            <div class="list-group-item">
+                                <div class="d-flex align-items-center">
+                                    <div class="resource-icon bg-{{ 'success' if resource.difficulty_level == 'beginner' else 'warning' if resource.difficulty_level == 'intermediate' else 'danger' }} bg-opacity-10 me-3">
+                                        <i class="bi bi-{{ 'book' if resource.resource_type == 'tutorial' else 'tools' if resource.resource_type == 'tool' else 'file-text' if resource.resource_type == 'article' else 'code-square' }}"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-1">{{ resource.title }}</h6>
+                                        <p class="mb-2 text-secondary small">{{ resource.description[:100] }}...</p>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="badge bg-{{ 'success' if resource.difficulty_level == 'beginner' else 'warning' if resource.difficulty_level == 'intermediate' else 'danger' }} rounded-pill">
+                                                {{ resource.difficulty_level.title() }}
+                                            </span>
+                                            <span class="badge bg-primary rounded-pill">
+                                                {{ resource.resource_type.title() }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="ms-3 d-flex gap-2">
+                                        {% if resource.files %}
+                                        <a href="{{ url_for('resource_file', id=resource.id, filename=resource.files[0].filename) }}" 
+                                           class="btn btn-outline-primary btn-sm">
+                                            <i class="bi bi-download"></i>
+                                        </a>
+                                        {% endif %}
+                                        <a href="{{ url_for('edit_resource', id=resource.id) }}" 
+                                           class="btn btn-outline-secondary btn-sm">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <button type="button" 
+                                                class="btn btn-outline-danger btn-sm"
+                                                data-resource-id="{{ resource.id }}">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="text-center py-5">
+                            <div class="display-1 text-secondary mb-4">
+                                <i class="bi bi-collection"></i>
+                            </div>
+                            <h5>No Resources Yet</h5>
+                            <p class="text-secondary">Share your first resource with the community!</p>
+                            <a href="{{ url_for('new_resource') }}" class="btn btn-primary mt-3">
+                                <i class="bi bi-plus-lg me-2"></i>Share Resource
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Recent Activity Card -->
+                <div class="card">
+                    <div class="card-header border-0 bg-transparent py-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h5 class="card-title mb-0">Recent Activity</h5>
+                                <p class="text-secondary small mb-0">Latest updates from the community</p>
+                            </div>
+                            <div class="dropdown">
+                                <button class="btn btn-link text-secondary p-0" data-bs-toggle="dropdown">
+                                    <i class="bi bi-three-dots-vertical"></i>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="#">View All</a></li>
+                                    <li><a class="dropdown-item" href="#">Mark All as Read</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        {% if recent_activity %}
+                        <div class="list-group list-group-flush">
+                            {% for activity in recent_activity %}
+                            <div class="list-group-item">
+                                <div class="d-flex align-items-center">
+                                    <div class="activity-icon bg-{{ activity.type }} bg-opacity-10 text-{{ activity.type }} me-3">
+                                        <i class="bi bi-{{ activity.icon }}"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <h6 class="mb-1">{{ activity.title }}</h6>
+                                            <small class="text-secondary">{{ activity.time }}</small>
+                                        </div>
+                                        <p class="mb-1 text-secondary">{{ activity.description }}</p>
+                                        {% if activity.resource %}
+                                        <div class="resource-card mt-2 p-3 border rounded-3">
+                                            <div class="d-flex align-items-center">
+                                                <div class="resource-icon me-3">
+                                                    <i class="bi bi-{{ activity.resource.icon }} text-{{ activity.type }}"></i>
+                                                </div>
+                                                <div class="flex-grow-1">
+                                                    <h6 class="mb-1">{{ activity.resource.title }}</h6>
+                                                    <p class="mb-2 text-secondary small">{{ activity.resource.description[:100] }}...</p>
+                                                    <div class="d-flex align-items-center gap-3">
+                                                        {% if activity.resource.files %}
+                                                        <a href="{{ url_for('resource_file', id=activity.resource.id, filename=activity.resource.files[0].filename) }}" class="btn btn-sm btn-outline-primary">
+                                                            <i class="bi bi-download me-2"></i>Download
+                                                        </a>
+                                                        {% endif %}
+                                                        <a href="{{ url_for('view_resource', id=activity.resource.id) }}" class="btn btn-sm btn-link text-primary p-0">
+                                                            View Details
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="text-center py-5">
+                            <div class="display-1 text-secondary mb-4">
+                                <i class="bi bi-clock-history"></i>
+                            </div>
+                            <h5>No Recent Activity</h5>
+                            <p class="text-secondary">Start exploring resources to see activity here!</p>
+                            <a href="{{ url_for('resources') }}" class="btn btn-primary mt-3">
+                                <i class="bi bi-compass me-2"></i>Explore Resources
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title" id="deleteModalLabel">Delete Resource</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this resource? This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form id="deleteForm" method="POST" action="">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function confirmDelete(resourceId) {
+    const deleteForm = document.getElementById('deleteForm');
+    deleteForm.action = `/resources/${resourceId}/delete`;
+    const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+    modal.show();
+}
+
+// Add event listeners to all delete buttons
+document.querySelectorAll('[data-resource-id]').forEach(button => {
+    button.addEventListener('click', function() {
+        confirmDelete(this.dataset.resourceId);
+    });
+});
+</script>
+{% endblock %}

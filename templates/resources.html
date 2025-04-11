@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block title %}Community Resources{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Search and Filters -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form action="{{ url_for('search_resources') }}" method="GET" class="row g-3">
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <input type="text" name="q" class="form-control" placeholder="Search resources..." 
+                               value="{{ query }}">
+                        <button class="btn btn-primary" type="submit">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <select name="category" class="form-select">
+                        <option value="all" {% if current_category == 'all' %}selected{% endif %}>All Categories</option>
+                        {% for category in categories %}
+                        <option value="{{ category }}" {% if current_category == category %}selected{% endif %}>
+                            {{ category.title() }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select name="difficulty" class="form-select">
+                        <option value="all" {% if current_difficulty == 'all' %}selected{% endif %}>All Levels</option>
+                        <option value="beginner" {% if current_difficulty == 'beginner' %}selected{% endif %}>Beginner</option>
+                        <option value="intermediate" {% if current_difficulty == 'intermediate' %}selected{% endif %}>Intermediate</option>
+                        <option value="advanced" {% if current_difficulty == 'advanced' %}selected{% endif %}>Advanced</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select name="type" class="form-select">
+                        <option value="all" {% if current_type == 'all' %}selected{% endif %}>All Types</option>
+                        <option value="tutorial" {% if current_type == 'tutorial' %}selected{% endif %}>Tutorial</option>
+                        <option value="article" {% if current_type == 'article' %}selected{% endif %}>Article</option>
+                        <option value="video" {% if current_type == 'video' %}selected{% endif %}>Video</option>
+                        <option value="code" {% if current_type == 'code' %}selected{% endif %}>Code</option>
+                        <option value="tool" {% if current_type == 'tool' %}selected{% endif %}>Tool</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">Apply Filters</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Resources List -->
+    <div class="row">
+        {% if resources %}
+            {% for resource in resources %}
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <h5 class="card-title">
+                                <a href="{{ url_for('view_resource', id=resource.id) }}" class="text-decoration-none">
+                                    {{ resource.title }}
+                                </a>
+                            </h5>
+                            <span class="badge bg-primary">{{ resource.resource_type.title() }}</span>
+                        </div>
+                        
+                        <p class="card-text text-secondary small">{{ resource.description[:150] }}...</p>
+                        
+                        <div class="d-flex align-items-center gap-2 mb-3">
+                            <span class="badge bg-{{ 'success' if resource.difficulty_level == 'beginner' else 'warning' if resource.difficulty_level == 'intermediate' else 'danger' }} rounded-pill">
+                                {{ resource.difficulty_level.title() }}
+                            </span>
+                            {% if resource.category %}
+                            <span class="badge bg-info rounded-pill">{{ resource.category.title() }}</span>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center gap-3">
+                                <a href="{{ url_for('view_profile', username=resource.user.name) }}" class="text-decoration-none">
+                                    <img src="{{ url_for('static', filename='profile_pics/' + resource.user.profile_pic) }}" 
+                                         class="rounded-circle" alt="Profile Picture"
+                                         style="width: 32px; height: 32px; object-fit: cover;">
+                                </a>
+                                <div>
+                                    <div class="small">{{ resource.user.name }}</div>
+                                    <div class="text-muted small">
+                                        {{ resource.created_at.strftime('%B %d, %Y') }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="text-muted small">
+                                    <i class="bi bi-eye"></i> {{ resource.views }}
+                                </span>
+                                <span class="text-muted small">
+                                    <i class="bi bi-heart"></i> {{ resource.likes }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12">
+                <div class="text-center py-5">
+                    <div class="display-1 text-secondary mb-4">
+                        <i class="bi bi-search"></i>
+                    </div>
+                    <h5>No Resources Found</h5>
+                    <p class="text-secondary">Try adjusting your search or filters</p>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

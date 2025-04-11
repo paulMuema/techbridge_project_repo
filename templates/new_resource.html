@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title mb-4">Share New Resource</h2>
+                    <form method="POST" enctype="multipart/form-data" id="resourceForm">
+                        <!-- Basic Information -->
+                        <div class="mb-4">
+                            <h5 class="mb-3">Basic Information</h5>
+                            <div class="mb-3">
+                                <label for="title" class="form-label">Title</label>
+                                <input type="text" class="form-control" id="title" name="title" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="description" class="form-label">Description</label>
+                                <textarea class="form-control" id="description" name="description" rows="4" required
+                                    placeholder="Provide a detailed description of your resource..."></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Resource Details -->
+                        <div class="mb-4">
+                            <h5 class="mb-3">Resource Details</h5>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="resource_type" class="form-label">Resource Type</label>
+                                    <select class="form-select" id="resource_type" name="resource_type" required>
+                                        <option value="">Select Type</option>
+                                        <option value="tutorial">Tutorial</option>
+                                        <option value="tool">Tool</option>
+                                        <option value="article">Article</option>
+                                        <option value="project">Project</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="difficulty_level" class="form-label">Difficulty Level</label>
+                                    <select class="form-select" id="difficulty_level" name="difficulty_level" required>
+                                        <option value="beginner">Beginner</option>
+                                        <option value="intermediate">Intermediate</option>
+                                        <option value="advanced">Advanced</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Content Type</label>
+                            <div class="btn-group w-100" role="group">
+                                <input type="radio" class="btn-check" name="content_type" id="type_url" value="url" checked>
+                                <label class="btn btn-outline-primary" for="type_url">
+                                    <i class="bi bi-link-45deg"></i> External URL
+                                </label>
+                                
+                                <input type="radio" class="btn-check" name="content_type" id="type_file" value="file">
+                                <label class="btn btn-outline-primary" for="type_file">
+                                    <i class="bi bi-file-earmark"></i> Upload File
+                                </label>
+                            </div>
+                        </div>
+
+                        <div id="urlSection" class="mb-3">
+                            <label for="url" class="form-label">URL</label>
+                            <input type="url" class="form-control" id="url" name="url"
+                                   placeholder="https://...">
+                            <div class="form-text">Link to the resource (e.g., tutorial page, GitHub repository)</div>
+                        </div>
+
+                        <div id="fileSection" class="mb-3" style="display: none;">
+                            <label for="files" class="form-label">Upload Files</label>
+                            <input type="file" class="form-control" id="files" name="files" multiple
+                                   accept=".pdf,.doc,.docx,.txt,.md,.png,.jpg,.jpeg,.gif,.mp4,.webm,.mov,.py,.js,.html,.css,.java,.cpp,.c,.rb">
+                            <div class="form-text">
+                                Supported formats:<br>
+                                - Documents: PDF, DOC, DOCX, TXT, MD<br>
+                                - Images: PNG, JPG, JPEG, GIF<br>
+                                - Videos: MP4, WebM, MOV<br>
+                                - Code: PY, JS, HTML, CSS, Java, CPP, C, RB<br>
+                                Maximum file size per file: 50MB<br>
+                                You can select multiple files
+                            </div>
+                            <div id="selectedFiles" class="mt-2"></div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="4" required
+                                    placeholder="Describe what this resource is about and why it's helpful..."></textarea>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="tags" class="form-label">Tags</label>
+                            <input type="text" class="form-control" id="tags" name="tags"
+                                   placeholder="python, web development, beginner (comma-separated)">
+                            <div class="form-text">Add relevant tags to help others find your resource</div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Share Resource</button>
+                            <a href="{{ url_for('resources') }}" class="btn btn-outline-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Format tags as they're typed
+    const tagsInput = document.getElementById('tags');
+    tagsInput.addEventListener('input', function() {
+        // Remove extra spaces and multiple commas
+        this.value = this.value.replace(/\s*,\s*/g, ', ').replace(/,+/g, ',').trim();
+        
+        // Remove comma if it's the first character
+        if (this.value.startsWith(',')) {
+            this.value = this.value.substring(1);
+        }
+    });
+
+    // Handle content type switching
+    const urlSection = document.getElementById('urlSection');
+    const fileSection = document.getElementById('fileSection');
+    const urlInput = document.getElementById('url');
+    const fileInput = document.getElementById('files');
+
+    document.querySelectorAll('input[name="content_type"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            if (this.value === 'url') {
+                urlSection.style.display = 'block';
+                fileSection.style.display = 'none';
+                urlInput.required = true;
+                fileInput.required = false;
+            } else {
+                urlSection.style.display = 'none';
+                fileSection.style.display = 'block';
+                urlInput.required = false;
+                fileInput.required = true;
+            }
+        });
+    });
+
+    // Show selected files
+    fileInput.addEventListener('change', function() {
+        const selectedFilesDiv = document.getElementById('selectedFiles');
+        selectedFilesDiv.innerHTML = '';
+        let totalSize = 0;
+
+        Array.from(this.files).forEach(file => {
+            const fileSize = file.size / (1024 * 1024); // Convert to MB
+            totalSize += fileSize;
+
+            if (fileSize > 50) {
+                alert(`File ${file.name} exceeds 50MB limit`);
+                this.value = '';
+                selectedFilesDiv.innerHTML = '';
+                return;
+            }
+
+            const fileDiv = document.createElement('div');
+            fileDiv.className = 'alert alert-info d-flex align-items-center py-2 mb-2';
+            fileDiv.innerHTML = `
+                <i class="bi bi-paperclip me-2"></i>
+                <div class="flex-grow-1">${file.name}</div>
+                <small class="text-muted">${fileSize.toFixed(2)} MB</small>
+            `;
+            selectedFilesDiv.appendChild(fileDiv);
+        });
+
+        if (totalSize > 100) {
+            alert('Total file size exceeds 100MB limit');
+            this.value = '';
+            selectedFilesDiv.innerHTML = '';
+        }
+    });
+});
+</script>
+{% endblock %}
