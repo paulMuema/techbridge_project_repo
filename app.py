@@ -34,6 +34,14 @@ ALLOWED_RESOURCE_EXTENSIONS = {
     'code': {'py', 'js', 'html', 'css', 'java', 'cpp', 'c', 'rb'}
 }
 
+# Add nl2br filter
+@app.template_filter('nl2br')
+def nl2br(value):
+    """Convert newlines to <br> tags"""
+    if value is None:
+        return ''
+    return value.replace('\n', '<br>')
+
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
@@ -743,3 +751,5 @@ def send_message():
 if __name__ == '__main__':
     update_existing_ratings()
     app.run(debug=True)
+
+  
